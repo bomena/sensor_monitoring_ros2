@@ -4,9 +4,6 @@ import '../index.css';
 import sensorConfig from '../sensorConfig.json';
 import noSignalImage from '../svg/black.png';
 
-let active = false;
-
-
 const Sensor = () => {
   const [imageSrc1, setImageSrc1] = useState(noSignalImage);
   const [imageSrc2, setImageSrc2] = useState(noSignalImage);
