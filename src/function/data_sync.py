@@ -66,6 +66,8 @@ def main(args=None):
         rclpy.spin(sensor_sync_checker)
     except KeyboardInterrupt:
         pass
+    except rclpy.executors.ExternalShutdownException:
+        pass
     finally:
         sensor_sync_checker.destroy_node()
         rclpy.shutdown()
