@@ -1,10 +1,6 @@
 #!/bin/bash
 
 # Start roscore in the background
-roscore &
-ROSCORE_PID=$!
-sleep 2  # Give roscore time to start
-
 # npm start 프로세스 종료 함수 정의
 cleanup() {
     echo "Stopping npm server..."
@@ -17,11 +13,6 @@ cleanup() {
         kill $ROSLAUNCH_PID
     fi
 
-    echo "Stopping roscore..."
-    if [ ! -z "$ROSCORE_PID" ]; then
-        kill $ROSCORE_PID
-    fi
-
     echo "Stopping other background processes..."
     pkill -P $$  # This will kill all child processes started by this script
 }
@@ -30,7 +21,7 @@ cleanup() {
 trap cleanup EXIT
 
 # roslaunch를 백그라운드에서 실행하고 PID 저장
-roslaunch rosbridge_server rosbridge_websocket.launch &
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml &
 ROSLAUNCH_PID=$!
 sleep 2  # Give roslaunch time to start
 

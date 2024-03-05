@@ -8,7 +8,7 @@ from std_msgs.msg import String, Bool
 import datetime
 
 # rosbag record path
-path = "/home/user/Documents/monitoring"
+path = "/home/dataset"
 
 rosbag_process = None
 
@@ -22,12 +22,12 @@ class RosbagControlNode(Node):
 
     def check_rosbag_status(self):
         global path
-        list_of_files = glob.glob(path + '/*.bag.active')
+        list_of_files = glob.glob(path + '/*.db3.active')
         return True if list_of_files else False
 
     def get_rosbag_size(self):
         global path
-        list_of_files = glob.glob(path + '/*.bag.active')
+        list_of_files = glob.glob(path + '/*.db3.active')
         if not list_of_files:
             return "0 GB"
 
@@ -43,7 +43,7 @@ class RosbagControlNode(Node):
             if rosbag_process is not None:
                 subprocess.call(["pkill", "-f", "rosbag record"])
                 rosbag_process = None
-            rosbag_process = subprocess.Popen(["/home/user/Documents/monitoring/test.sh"])
+            rosbag_process = subprocess.Popen(["/home/Web/sensor_monitoring_ros2/record.sh"])
         elif data.data == "OFF":
             self.get_logger().info("----------------------------OFF------------------------------")
             if rosbag_process:

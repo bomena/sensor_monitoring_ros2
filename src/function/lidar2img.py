@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 from sensor_msgs.msg import PointCloud2, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
-import sensor_msgs.point_cloud2 as pc2
+import sensor_msgs_py.point_cloud2 as pc2
 from rclpy.qos import qos_profile_sensor_data
 import time
 
@@ -16,14 +16,16 @@ class PointCloudToImage(Node):
         self.image_pub = self.create_publisher(CompressedImage, "/converted_image/compressed", 1)
 
         ################################ MODIFY ####################################
-        self.subscription = self.create_subscription(PointCloud2, "/ouster/points", self.callback, qos_profile_sensor_data)
+        self.subscription1 = self.create_subscription(PointCloud2, "/ouster1/points", self.callback, qos_profile_sensor_data)
+        self.subscription2 = self.create_subscription(PointCloud2, "/ouster2/points", self.callback, qos_profile_sensor_data)
+        self.subscription3 = self.create_subscription(PointCloud2, "/ouster3/points", self.callback, qos_profile_sensor_data)
         ############################################################################
 
-        self.last_time = self.get_clock().now().to_sec()
+        self.last_time = self.get_clock().now().nanoseconds / 1e9
         self.interval = 1  # 이미지를 전송할 시간 간격 (초)
 
     def callback(self, data):
-        current_time = self.get_clock().now().to_sec()
+        current_time = self.get_clock().now().nanoseconds / 1e9
         if current_time - self.last_time >= self.interval:
             self.last_time = current_time
 
