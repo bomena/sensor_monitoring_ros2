@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 from sensor_msgs.msg import PointCloud2, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
-import sensor_msgs_py.point_cloud2 as pc2
+import sensor_msgs.point_cloud2 as pc2
 from rclpy.qos import qos_profile_sensor_data
 import time
 
