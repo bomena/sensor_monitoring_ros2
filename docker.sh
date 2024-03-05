@@ -9,4 +9,4 @@ sudo docker run --name monitoring_ros2 -it \
   -v /dev:/dev \
   -v /media/user/My\ Passport:/home/dataset \
   -w /home/Web/sensor_monitoring_ros2 \
-  monitoring_ros2:latest
+  bmn3626/sensor_monitoring_ros2:latest

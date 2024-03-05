@@ -1,5 +1,5 @@
 FROM ubuntu:jammy
-FROM osrf/ros:humble
+FROM osrf/ros:humble-desktop-full-jammy
 
 RUN \
   apt-get -qq update && \
@@ -10,8 +10,8 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get -qq install nodejs --yes
 RUN \
   apt install -y python3-pip && \
-  apt install -y ros-humble-novatel-oem7-driver &&
-  apt install -y ros-humble-novatel-oem7-msgs &&
+  apt install -y ros-humble-novatel-oem7-driver && \
+  apt install -y ros-humble-novatel-oem7-msgs && \
   apt-get install ros-humble-sensor-msgs-py
 
 WORKDIR /home/Web

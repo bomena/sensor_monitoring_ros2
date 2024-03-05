@@ -2,5 +2,5 @@
 cd /home/dataset
 
 ######MODIFY#####
-rosbag record -a
+ros2 bag record -a
 #################

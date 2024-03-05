@@ -3,6 +3,10 @@
     "Color2": { "topic": "/blackfly/image_raw/compressed", "messageType": "sensor_msgs/msg/CompressedImage" },
     "GPS": { "topic": "/gps/fix", "messageType": "sensor_msgs/NavSatFix" },
     "IMU": { "topic": "/imu/data_raw", "messageType": "sensor_msgs/msg/Imu" },
-    "LiDAR": { "topic": "/ouster1/points", "messageType": "sensor_msgs/msg/PointCloud2" },
-    "LiDAR_img": { "topic": "/converted_image/compressed", "messageType": "sensor_msgs/CompressedImage" }
+    "LiDAR1": { "topic": "/ouster1/points", "messageType": "sensor_msgs/msg/PointCloud2" },
+    "LiDAR2": { "topic": "/ouster2/points", "messageType": "sensor_msgs/msg/PointCloud2" },
+    "LiDAR3": { "topic": "/ouster3/points", "messageType": "sensor_msgs/msg/PointCloud2" },
+    "LiDAR_img1": { "topic": "/converted_image1/compressed", "messageType": "sensor_msgs/CompressedImage" },
+    "LiDAR_img2": { "topic": "/converted_image2/compressed", "messageType": "sensor_msgs/CompressedImage" },
+    "LiDAR_img3": { "topic": "/converted_image3/compressed", "messageType": "sensor_msgs/CompressedImage" }
 }

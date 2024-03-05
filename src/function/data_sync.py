@@ -3,7 +3,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, CompressedImage
 from std_msgs.msg import String
-from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.callback_groups import ReentrantCallbackGroup  # 이 줄을 추가하세요
 import json
 import threading
 

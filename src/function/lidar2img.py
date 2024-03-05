@@ -5,7 +5,6 @@ import numpy as np
 import cv2
 from sensor_msgs.msg import PointCloud2, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
-import sensor_msgs_py.point_cloud2 as pc2
 from rclpy.qos import qos_profile_sensor_data
 import time
 
@@ -13,33 +12,45 @@ class PointCloudToImage(Node):
     def __init__(self):
         super().__init__('point_cloud_to_image_converter')
         self.bridge = CvBridge()
-        self.image_pub = self.create_publisher(CompressedImage, "/converted_image/compressed", 1)
+        # 세 개의 이미지 퍼블리셔 생성
+        self.image_pub1 = self.create_publisher(CompressedImage, "/converted_image1/compressed", 1)
+        self.image_pub2 = self.create_publisher(CompressedImage, "/converted_image2/compressed", 1)
+        self.image_pub3 = self.create_publisher(CompressedImage, "/converted_image3/compressed", 1)
 
-        ################################ MODIFY ####################################
-        self.subscription1 = self.create_subscription(PointCloud2, "/ouster1/points", self.callback, qos_profile_sensor_data)
-        self.subscription2 = self.create_subscription(PointCloud2, "/ouster2/points", self.callback, qos_profile_sensor_data)
-        self.subscription3 = self.create_subscription(PointCloud2, "/ouster3/points", self.callback, qos_profile_sensor_data)
-        ############################################################################
+        # 세 개의 LiDAR 데이터 구독
+        self.subscription1 = self.create_subscription(PointCloud2, "/ouster1/points", self.callback1, qos_profile_sensor_data)
+        self.subscription2 = self.create_subscription(PointCloud2, "/ouster2/points", self.callback2, qos_profile_sensor_data)
+        self.subscription3 = self.create_subscription(PointCloud2, "/ouster3/points", self.callback3, qos_profile_sensor_data)
 
         self.last_time = self.get_clock().now().nanoseconds / 1e9
         self.interval = 1  # 이미지를 전송할 시간 간격 (초)
 
-    def callback(self, data):
+    # 각 LiDAR 데이터 소스에 대한 콜백 함수
+    def callback1(self, data):
+        self.process_data(data, self.image_pub1)
+
+    def callback2(self, data):
+        self.process_data(data, self.image_pub2)
+
+    def callback3(self, data):
+        self.process_data(data, self.image_pub3)
+
+    def process_data(self, data, publisher):
         current_time = self.get_clock().now().nanoseconds / 1e9
         if current_time - self.last_time >= self.interval:
             self.last_time = current_time
 
             # PointCloud2 데이터를 numpy 배열로 변환
-            pc_array = pc2.read_points(data, field_names=("x", "y", "z"), skip_nans=True)
+            pc_array = self.read_points(data, field_names=("x", "y", "z"), skip_nans=True)
             points = np.array(list(pc_array))
 
             # 이미지 변환
             image = self.convert_to_image(points)
 
-            # OpenCV 이미지를 ROS CompressedImage 메시지로 변환
+            # OpenCV 이미지를 ROS CompressedImage 메시지로 변환하여 발행
             try:
                 ros_image = self.bridge.cv2_to_compressed_imgmsg(image, 'jpg')
-                self.image_pub.publish(ros_image)
+                publisher.publish(ros_image)
             except CvBridgeError as e:
                 self.get_logger().error(str(e))
 
