@@ -1,0 +1,10 @@
+{
+    "Color1": { "topic": "/color1/image_color/compressed", "messageType": "sensor_msgs/CompressedImage" },
+    "Color2": { "topic": "/color2/image_color/compressed", "messageType": "sensor_msgs/CompressedImage" },
+    "GPS": { "topic": "/gps/fix", "messageType": "sensor_msgs/NavSatFix" },
+    "IMU": { "topic": "/imu/data_raw", "messageType": "sensor_msgs/Imu" },
+    "LWIR1": { "topic": "/lwir1/image_raw/compressed", "messageType": "sensor_msgs/CompressedImage" },
+    "LWIR2": { "topic": "/lwir2/image_raw/compressed", "messageType": "sensor_msgs/CompressedImage" },
+    "LiDAR": { "topic": "/os_cloud_node/points", "messageType": "sensor_msgs/PointCloud2" },
+    "LiDAR_img": { "topic": "/converted_image/compressed", "messageType": "sensor_msgs/CompressedImage" }
+}
