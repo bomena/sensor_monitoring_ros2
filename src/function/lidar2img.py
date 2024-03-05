@@ -79,10 +79,17 @@ class PointCloudToImage(Node):
 def main(args=None):
     rclpy.init(args=args)
     point_cloud_to_image_converter = PointCloudToImage()
-    rclpy.spin(point_cloud_to_image_converter)
-    # Destroy the node explicitly
-    point_cloud_to_image_converter.destroy_node()
-    rclpy.shutdown()
+
+    try:
+        rclpy.spin(point_cloud_to_image_converter)
+    except KeyboardInterrupt:
+        point_cloud_to_image_converter.get_logger().info('Keyboard interrupt (Ctrl+C) detected, shutting down...')
+    except rclpy.executors.ExternalShutdownException:
+        pass
+    finally:
+        if rclpy.ok():
+            point_cloud_to_image_converter.destroy_node()
+            rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
