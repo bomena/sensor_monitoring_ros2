@@ -3,19 +3,17 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, CompressedImage
 from std_msgs.msg import String
+from rclpy.callback_groups import ReentrantCallbackGroup  # 이 줄을 추가하세요
 import json
 import threading
 
 class SensorSyncChecker(Node):
     def __init__(self):
         super().__init__('sensor_sync_checker')
-        # 센서 데이터 타임스탬프 저장용 (각 센서별로 타임스탬프 저장)
-        self.sensor_data_timestamps = {
-            'camera1': 0, 'camera2': 0, 'lidar1': 0, 'lidar2': 0, 'lidar3': 0
-        }
-        # 동기화 상태를 전송하기 위한 퍼블리셔
+        self.sensor_data_timestamps = {'camera1': 0, 'camera2': 0, 'lidar1': 0, 'lidar2': 0, 'lidar3': 0}
         self.sync_status_publisher = self.create_publisher(String, '/sensor_sync_status', 10)
-        self.callback_group = ReentrantCallbackGroup()
+        
+        self.callback_group = ReentrantCallbackGroup()  # 여기에서 사용됩니다
 
         # 센서별 서브스크립션 생성
         self.create_subscription(CompressedImage, "/a65/image_raw/compressed", self.callback_camera1, 10, callback_group=self.callback_group)
@@ -24,10 +22,7 @@ class SensorSyncChecker(Node):
         self.create_subscription(PointCloud2, "/ouster2/points", self.callback_lidar2, 10, callback_group=self.callback_group)
         self.create_subscription(PointCloud2, "/ouster3/points", self.callback_lidar3, 10, callback_group=self.callback_group)
 
-        # 동기화 체크를 위한 타이머
         self.timer = self.create_timer(5, self.check_sync)
-
-        # 스레드 잠금을 위한 락 생성
         self.lock = threading.Lock()
 
     def callback_camera1(self, msg):
