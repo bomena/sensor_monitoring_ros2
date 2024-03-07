@@ -25,9 +25,6 @@ canvas {
   height: 100%;
 }
 
-
-
-
 .grid {
   color: aliceblue;
   margin: 20px 20px;
@@ -47,7 +44,7 @@ canvas {
     grid-column-start: 4;
     grid-column-end: 6;
     grid-row-start: 1;
-    grid-row-end: 4;
+    grid-row-end: 3;
   }
 
   .sensor_sync{
@@ -60,19 +57,24 @@ canvas {
     grid-column-start: 2;
     grid-column-end: 4;
     grid-row-start: 2;
-    grid-row-end: 4;
+    grid-row-end: 3;
   }
   .sensor_display {
     grid-column-start: 1;
     grid-column-end: 6;
-    grid-row-start: 4;
+    grid-row-start: 3;
     grid-row-end: 7;
     .display_grid {
       color: aliceblue;
       margin: 20px 20px;
       display: grid;
       gap: 10px;
-      grid-template-columns: 1fr 1fr 2fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      .cam_grid {
+        display: grid;
+        gap: 5px;
+        grid-template-rows: 7fr 5fr;
+      }
     }
   }
 

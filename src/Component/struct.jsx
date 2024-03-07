@@ -34,10 +34,10 @@ const SetViz = (props) => {
           <Sensor />
         </div>
         <div>
-          
+
         </div>
       </div>
-    </>   
+    </>
 
   )
 }

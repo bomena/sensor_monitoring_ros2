@@ -1,76 +1,54 @@
-#!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import PointCloud2, CompressedImage
-from std_msgs.msg import String
-from rclpy.callback_groups import ReentrantCallbackGroup  # 이 줄을 추가하세요
-import json
-import threading
+from rclpy.qos import QoSProfile, ReliabilityPolicy
+from sensor_msgs.msg import CompressedImage, PointCloud2
+from std_msgs.msg import Bool
+import time
 
-class SensorSyncChecker(Node):
+class SensorSyncCheckNode(Node):
     def __init__(self):
-        super().__init__('sensor_sync_checker')
-        self.sensor_data_timestamps = {'camera1': 0, 'camera2': 0, 'lidar1': 0, 'lidar2': 0, 'lidar3': 0}
-        self.sync_status_publisher = self.create_publisher(String, '/sensor_sync_status', 10)
-        
-        self.callback_group = ReentrantCallbackGroup()  # 여기에서 사용됩니다
+        super().__init__('sensor_sync_check_node')
+        self.publisher = self.create_publisher(Bool, '/sensor_sync_status', 10)
 
-        # 센서별 서브스크립션 생성
-        self.create_subscription(CompressedImage, "/a65/image_raw/compressed", self.callback_camera1, 10, callback_group=self.callback_group)
-        self.create_subscription(CompressedImage, "/blackfly/image_raw/compressed", self.callback_camera2, 10, callback_group=self.callback_group)
-        self.create_subscription(PointCloud2, "/ouster1/points", self.callback_lidar1, 10, callback_group=self.callback_group)
-        self.create_subscription(PointCloud2, "/ouster2/points", self.callback_lidar2, 10, callback_group=self.callback_group)
-        self.create_subscription(PointCloud2, "/ouster3/points", self.callback_lidar3, 10, callback_group=self.callback_group)
+        best_effort_qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.BEST_EFFORT)
+        reliable_qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE)
 
-        self.timer = self.create_timer(5, self.check_sync)
-        self.lock = threading.Lock()
+        self.create_subscription(CompressedImage, "/a65/image_raw/compressed", self.sensor_callback, reliable_qos)
+        self.create_subscription(CompressedImage, "/blackfly/image_raw/compressed", self.sensor_callback, reliable_qos)
+        self.create_subscription(PointCloud2, "/ouster1/points", self.sensor_callback, best_effort_qos)
+        self.create_subscription(PointCloud2, "/ouster2/points", self.sensor_callback, best_effort_qos)
+        self.create_subscription(PointCloud2, "/ouster3/points", self.sensor_callback, best_effort_qos)
 
-    def callback_camera1(self, msg):
-        with self.lock:
-            self.sensor_data_timestamps['camera1'] = self.get_clock().now().nanoseconds / 1e9
+        self.received_data = False
 
-    def callback_camera2(self, msg):
-        with self.lock:
-            self.sensor_data_timestamps['camera2'] = self.get_clock().now().nanoseconds / 1e9
+    def sensor_callback(self, msg):
+        self.received_data = True
 
-    def callback_lidar1(self, msg):
-        with self.lock:
-            self.sensor_data_timestamps['lidar1'] = self.get_clock().now().nanoseconds / 1e9
+    def check_sensor_sync(self):
+        check_intervals = 0.09  # 90ms
+        attempts = 10
+        out_of_sync_count = 0
 
-    def callback_lidar2(self, msg):
-        with self.lock:
-            self.sensor_data_timestamps['lidar2'] = self.get_clock().now().nanoseconds / 1e9
+        for _ in range(attempts):
+            self.received_data = False
+            time.sleep(check_intervals)
+            if not self.received_data:
+                out_of_sync_count += 1
 
-    def callback_lidar3(self, msg):
-        with self.lock:
-            self.sensor_data_timestamps['lidar3'] = self.get_clock().now().nanoseconds / 1e9
-
-    def check_sync(self):
-        with self.lock:
-            # 최대 시간 차이 계산
-            timestamps = list(self.sensor_data_timestamps.values())
-            max_time_diff = max(timestamps) - min(timestamps)
-            
-            # 동기화 상태와 최대 시간 차이를 JSON 형식으로 전송
-            sync_data = {
-                "is_synced": max_time_diff < 0.05,  # 50ms 미만이면 동기화된 것으로 간주
-                "max_time_diff": max_time_diff
-            }
-            self.sync_status_publisher.publish(String(data=json.dumps(sync_data)))
+        sync_status = out_of_sync_count <= attempts // 2
+        self.publisher.publish(Bool(data=sync_status))
+        if sync_status:
+            self.get_logger().info('Sensor sync is fine.')
+        else:
+            self.get_logger().warn('Sensor sync might be off.')
 
 def main(args=None):
     rclpy.init(args=args)
-    sensor_sync_checker = SensorSyncChecker()
-
-    try:
-        rclpy.spin(sensor_sync_checker)
-    except KeyboardInterrupt:
-        pass
-    except rclpy.executors.ExternalShutdownException:
-        pass
-    finally:
-        sensor_sync_checker.destroy_node()
-        rclpy.shutdown()
+    sensor_sync_check_node = SensorSyncCheckNode()
+    sensor_sync_check_node.check_sensor_sync()
+    rclpy.spin(sensor_sync_check_node)
+    sensor_sync_check_node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

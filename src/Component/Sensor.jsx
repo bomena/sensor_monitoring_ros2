@@ -10,7 +10,7 @@ const Sensor = () => {
   const [lidarSrc1, setLidarSrc1] = useState(noSignalImage);
   const [lidarSrc2, setLidarSrc2] = useState(noSignalImage);
   const [lidarSrc3, setLidarSrc3] = useState(noSignalImage);
-  
+
   useEffect(() => {
     const ros = new ROSLIB.Ros({url: 'ws://0.0.0.0:9090'});
     ros.on('connection', () => {
@@ -87,20 +87,22 @@ const Sensor = () => {
   }, []);
 
   const imageStyle = {
-    width: '25vw', // Set your desired width
+    width: '20vw', // Set your desired width
     height: 'auto', // Set your desired height
     margin: '5px'
   };
 
   const LidarStyle = {
-    width: '15vw',
-    margin: '5px'
+    width: '20vw',
+    margin: '5vw 0vw',
   };
 
   return (
     <div className='display_grid'>
-      <img src={imageSrc1} alt="Color Camera 1" style={imageStyle} />
-      <img src={imageSrc2} alt="Color Camera 2" style={imageStyle} />
+      <div className='cam_grid'>
+        <img src={imageSrc1} alt="Color Camera 1" style={imageStyle} />
+        <img src={imageSrc2} alt="Color Camera 2" style={imageStyle} />
+      </div>
       <img src={lidarSrc1} alt="Lidar" style={LidarStyle} />
       <img src={lidarSrc2} alt="Lidar" style={LidarStyle} />
       <img src={lidarSrc3} alt="Lidar" style={LidarStyle} />
@@ -109,3 +111,4 @@ const Sensor = () => {
 };
 
 export default Sensor;
+

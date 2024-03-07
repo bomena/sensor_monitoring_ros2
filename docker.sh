@@ -1,5 +1,5 @@
 xhost +local:docker
-sudo docker run --name monitoring_ros2 -it \
+sudo docker run --name test -it \
   --privileged \
   --env ROS_MASTER_URI=http://localhost:11311 \
   --net=host \
@@ -9,4 +9,4 @@ sudo docker run --name monitoring_ros2 -it \
   -v /dev:/dev \
   -v /media/user/My\ Passport:/home/dataset \
   -w /home/Web/sensor_monitoring_ros2 \
-  bmn3626/sensor_monitoring_ros2:latest
+  test:latest

@@ -10,59 +10,55 @@ import datetime
 # rosbag record path
 path = "/home/dataset"
 
-rosbag_process = None
-
 class RosbagControlNode(Node):
     def __init__(self):
         super().__init__('rosbag_control_node')
+        self.rosbag_process = None
         self.status_pub = self.create_publisher(Bool, '/rosbag_status', 10)
         self.size_pub = self.create_publisher(String, '/rosbag_size', 10)
-        self.subscription = self.create_subscription(String, '/rosbag_record', self.rosbag_record, 10)
-        self.timer = self.create_timer(1, self.timer_callback)
+        self.subscription = self.create_subscription(Bool, '/rosbag_record', self.rosbag_record_callback, 10)
+        self.timer = self.create_timer(1.0, self.timer_callback)
 
-    def check_rosbag_status(self):
-        global path
-        list_of_files = glob.glob(path + '/*.db3.active')
-        return True if list_of_files else False
+    def get_directory_size(self, path):
+        total_size = 0
+        for dirpath, dirnames, filenames in os.walk(path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                total_size += os.path.getsize(fp)
+        return total_size / (1024 ** 3)
 
-    def get_rosbag_size(self):
-        global path
-        list_of_files = glob.glob(path + '/*.db3.active')
-        if not list_of_files:
-            return "0 GB"
+    def rosbag_record_callback(self, msg):
+        # Path to your record.sh script
+        script_path = "/home/Web/sensor_monitoring_ros2/record.sh"
 
-        latest_file = max(list_of_files, key=os.path.getctime)
-        size = os.path.getsize(latest_file)
-        size_gb = size / (1024 * 1024 * 1024)
-        return f"{size_gb:.3f} GB"
-
-    def rosbag_record(self, data):
-        global rosbag_process
-        if data.data == "ON":
-            self.get_logger().info("----------------------------ON------------------------------")
-            if rosbag_process is not None:
-                subprocess.call(["pkill", "-f", "rosbag record"])
-                rosbag_process = None
-            rosbag_process = subprocess.Popen(["/home/Web/sensor_monitoring_ros2/record.sh"])
-        elif data.data == "OFF":
-            self.get_logger().info("----------------------------OFF------------------------------")
-            if rosbag_process:
-                subprocess.call(["pkill", "-f", "rosbag record"])
-                rosbag_process = None
+        if msg.data and not self.rosbag_process:
+            self.get_logger().info("Starting rosbag recording via record.sh...")
+            # Ensure the script is executable and specify the correct path
+            self.rosbag_process = subprocess.Popen([script_path], shell=True)
+        elif msg.data and self.rosbag_process:
+            self.get_logger().info("Stopping rosbag recording...")
+            self.rosbag_process.terminate()  # or use .kill() if .terminate() does not work as expected
+            self.rosbag_process = None
 
     def timer_callback(self):
-        status = self.check_rosbag_status()
-        size = self.get_rosbag_size()
+        if self.rosbag_process:
+            status = True
+            size = self.get_directory_size("/home/dataset")
+            size_msg = f"{size:.3f} GB"
+        else:
+            status = False
+            size_msg = "0 GB"
         self.status_pub.publish(Bool(data=status))
-        self.size_pub.publish(String(data=size))
+        self.size_pub.publish(String(data=size_msg))
 
 def main(args=None):
     rclpy.init(args=args)
     rosbag_control_node = RosbagControlNode()
-    rclpy.spin(rosbag_control_node)
-    # Clean up
-    rosbag_control_node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(rosbag_control_node)
+    finally:
+        rosbag_control_node.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

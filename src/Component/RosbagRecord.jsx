@@ -5,8 +5,8 @@ const RosbagRecord = () => {
   const [isOn, setIsOn] = useState(false);
   const [timer, setTimer] = useState(0);
   const [rosbagStatus, setRosbagStatus] = useState(false);
-  const recordPublisher = useRef(null);
-  const statusListener = useRef(null);
+  const recordPublisher = useRef(false);
+  const statusListener = useRef(false);
 
   useEffect(() => {
     const ros = new ROSLIB.Ros({ url: 'ws://0.0.0.0:9090' });
@@ -24,7 +24,7 @@ const RosbagRecord = () => {
     recordPublisher.current = new ROSLIB.Topic({
       ros: ros,
       name: '/rosbag_record',
-      messageType: 'std_msgs/String'
+      messageType: 'std_msgs/Bool'
     });
 
     statusListener.current = new ROSLIB.Topic({
@@ -42,7 +42,7 @@ const RosbagRecord = () => {
       }, 1000);
 
       const message = new ROSLIB.Message({
-        data: 'ON'
+        data: true
       });
       recordPublisher.current.publish(message);
     } else {
@@ -50,7 +50,7 @@ const RosbagRecord = () => {
       setTimer(0); // OFF 상태일 때 타이머 리셋
 
       const message = new ROSLIB.Message({
-        data: 'OFF'
+        data: false
       });
       recordPublisher.current.publish(message);
     }
@@ -92,3 +92,4 @@ const RosbagRecord = () => {
 };
 
 export default RosbagRecord;
+

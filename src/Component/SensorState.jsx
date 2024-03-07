@@ -65,12 +65,12 @@ const DataStreamButtons = () => {
   }, []);
 
   const getButtonStyle = (isActive) => ({
-    padding: '15px 25px',
+    padding: '10px 15px',
     margin: '5px',
     border: 'none',
     borderRadius: '5px',
     backgroundColor: isActive ? 'blue' : 'black',
-    fontSize: '30px',
+    fontSize: '25px',
     color: 'white',
     cursor: 'pointer',
   });
@@ -79,7 +79,7 @@ const DataStreamButtons = () => {
     <div>
       {Object.entries(sensorData).map(([key, data]) => (
         <button key={key} style={getButtonStyle(data.active)}>
-          {key}
+          <h5>{key}</h5>
         </button>
       ))}
     </div>
@@ -87,3 +87,4 @@ const DataStreamButtons = () => {
 };
 
 export default DataStreamButtons;
+

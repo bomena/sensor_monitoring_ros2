@@ -26,7 +26,7 @@ const RosbagControl = () => {
       }, 1000); // Reset timer after 1 second
     }
   };
-  
+
 
   const handleServiceCall = (action) => {
     const ros = new ROSLIB.Ros({ url: 'ws://0.0.0.0:9090' });
@@ -53,22 +53,22 @@ const RosbagControl = () => {
         console.log('ROS is not connected');
         reject('ROS is not connected');
       }
-  
+
       const topic = new ROSLIB.Topic({
         ros: ros,
         name: '/path',
         messageType: 'std_msgs/String'
       });
-  
+
       const message = new ROSLIB.Message({
         data: path
       });
-  
+
       topic.publish(message);
       resolve();
     });
   };
-  
+
 
   useEffect(() => {
     let interval;
@@ -109,7 +109,7 @@ const RosbagControl = () => {
         style={{ margin: '15px', padding: '10px', width: '50%', fontSize: '18px' }}
       />
       <RosbagSize />
-      
+
     </div>
   );
 };
