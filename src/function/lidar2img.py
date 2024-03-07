@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 import numpy as np
 import cv2
+import random
 from sensor_msgs.msg import PointCloud2, CompressedImage
 from sensor_msgs_py import point_cloud2
 from cv_bridge import CvBridge, CvBridgeError
@@ -39,8 +40,10 @@ class PointCloudToImage(Node):
         if current_time - self.last_time >= self.interval:
             self.last_time = current_time
 
-            pc_array = point_cloud2.read_points(data, field_names=("x", "y", "z"), skip_nans=True)
-            points = np.array(list(pc_array))
+            pc_generator = point_cloud2.read_points(data, field_names=("x", "y", "z"), skip_nans=True)
+            sampled_points = (point for i, point in enumerate(pc_generator) if i % 10 == 0)
+
+            points = np.array(list(sampled_points))
 
             image = self.convert_to_image(points)
 
