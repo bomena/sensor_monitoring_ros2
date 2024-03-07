@@ -41,7 +41,7 @@ const DataStreamButtons = () => {
       setSensorData(prevData => {
         const newData = { ...prevData };
         Object.keys(newData).forEach(key => {
-          if (newData[key].active && now - newData[key].lastUpdate > 2000) {
+          if (newData[key].active && now - newData[key].lastUpdate > 8000) {
             newData[key].active = false;
           }
         });

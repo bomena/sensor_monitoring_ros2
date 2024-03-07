@@ -3,7 +3,7 @@ import ROSLIB from 'roslib';
 
 
 const SensorSyncStatus = () => {
-  const [syncStatus, setSyncStatus] = useState(true);
+  const [syncStatus, setSyncStatus] = useState(false);
 
   useEffect(() => {
     const ros = new ROSLIB.Ros({url: 'ws://0.0.0.0:9090'});
@@ -54,8 +54,9 @@ const SensorSyncStatus = () => {
   return (
     <div style={getButtonStyle(syncStatus)}>
       <div style={{ padding: '10px' }}>
-        <h1>Sensor Synchronization ( per 5s )</h1>
-        <h2 style={{ marginTop: '13px' }}>{syncStatus ? 'Is_Synced : Yes' : 'Is_Synced : NO'}</h2>
+        <h1>Sensor Synchronization</h1>
+        <h2>(per 5s)</h2>
+        <h1 style={{ marginTop: '13px' }}>{syncStatus ? 'Is_Synced : Yes' : 'Is_Synced : NO'}</h1>
         {/* <p style={{ fontSize: '25px' }}>Is Synced: {syncStatus.is_synced ? 'Yes' : 'No'}</p> */}
         {/* <p style={{ fontSize: '25px' }}>Max Time Difference: {syncStatus.max_time_diff.toFixed(3)} s</p> */}
       </div>
