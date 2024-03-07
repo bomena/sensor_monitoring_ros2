@@ -29,19 +29,19 @@ const Sensor = () => {
         setImageSrc1(imageUrl);
       } else if (sensorId === 'Color2') {
         setImageSrc2(imageUrl);
-      } else if (sensorId === 'LiDAR_img1') {
+      } else if (sensorId === 'LiDAR1') {
         setLidarSrc1(imageUrl);
         // active = true;
-      } else if (sensorId === 'LiDAR_img2') {
+      } else if (sensorId === 'LiDAR2') {
         setLidarSrc2(imageUrl);
         // active = true;
-      } else if (sensorId === 'LiDAR_img3') {
+      } else if (sensorId === 'LiDAR3') {
         setLidarSrc3(imageUrl);
         // active = true;
       }
     };
 
-    ['Color1', 'Color2', 'LiDAR_img1', 'LiDAR_img2', 'LiDAR_img3'].forEach(sensorId => {
+    ['Color1', 'Color2', 'LiDAR1', 'LiDAR2', 'LiDAR3'].forEach(sensorId => {
       const sensorConfigData = sensorConfig[sensorId];
       if (sensorConfigData) {
         const sensorTopic = new ROSLIB.Topic({
@@ -57,7 +57,7 @@ const Sensor = () => {
     });
 
     return () => {
-      ['Color1', 'Color2', 'LiDAR_img1', 'LiDAR_img2', 'LiDAR_img3'].forEach(sensorId => {
+      ['Color1', 'Color2', 'LiDAR1', 'LiDAR2', 'LiDAR3'].forEach(sensorId => {
         const sensorConfigData = sensorConfig[sensorId];
         if (sensorConfigData) {
           const sensorTopic = new ROSLIB.Topic({
@@ -70,13 +70,13 @@ const Sensor = () => {
             setImageSrc1(noSignalImage);
           } else if (sensorId === 'Color2') {
             setImageSrc2(noSignalImage);
-          } else if (sensorId === 'LiDAR_img1') {
+          } else if (sensorId === 'LiDAR1') {
             setLidarSrc1(noSignalImage);
             // active = false;
-          } else if (sensorId === 'LiDAR_img2') {
+          } else if (sensorId === 'LiDAR2') {
             setLidarSrc2(noSignalImage);
             // active = false;
-          } else if (sensorId === 'LiDAR_img3') {
+          } else if (sensorId === 'LiDAR3') {
             setLidarSrc3(noSignalImage);
             // active = false;
           }
