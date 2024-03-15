@@ -8,6 +8,7 @@ from sensor_msgs.msg import PointCloud2, CompressedImage
 from sensor_msgs_py import point_cloud2
 from cv_bridge import CvBridge, CvBridgeError
 from rclpy.qos import qos_profile_sensor_data, QoSProfile, ReliabilityPolicy
+import time
 
 class PointCloudToImage(Node):
     def __init__(self):
@@ -40,12 +41,17 @@ class PointCloudToImage(Node):
         if current_time - self.last_time >= self.interval:
             self.last_time = current_time
 
-            pc_generator = point_cloud2.read_points(data, field_names=("x", "y", "z"), skip_nans=True)
-            sampled_points = (point for i, point in enumerate(pc_generator) if i % 10 == 0)
+            pc_generator = point_cloud2.read_points(data, field_names=("x", "y"), skip_nans=True)
 
-            points = np.array(list(sampled_points))
+            # pc_generator: 4.38690185546875e-05
 
-            image = self.convert_to_image(points)
+            # x, y 데이터 추출 및 소수점 둘째 자리로 반올림
+            points_list = [(round(point[0], 2), round(point[1], 2)) for point in pc_generator]
+            
+            # 유니크한 좌표만 선택
+            unique_points = np.unique(points_list, axis=0)
+
+            image = self.convert_to_image(unique_points)
 
             try:
                 ros_image = self.bridge.cv2_to_compressed_imgmsg(image, 'jpg')
@@ -54,22 +60,24 @@ class PointCloudToImage(Node):
                 self.get_logger().error(str(e))
 
     def convert_to_image(self, points):
-        height = 880
-        width = 880
+        height, width = 880, 880
         image = np.zeros((height, width, 3), np.uint8)
 
-        fixed_max_x =15
-        fixed_min_x = -15
-        fixed_max_y = 15
-        fixed_min_y = -15
+        fixed_max_x, fixed_min_x = 15, -15
+        fixed_max_y, fixed_min_y = 15, -15
 
-        for point in points:
-            x_scaled = int(((point[0] - fixed_min_x) / (fixed_max_x - fixed_min_x)) * width)
-            y_scaled = int(((point[1] - fixed_min_y) / (fixed_max_y - fixed_min_y)) * height)
-            y_scaled = height - y_scaled
+        x_scaled = (points[:, 0] - fixed_min_x) / (fixed_max_x - fixed_min_x)
+        y_scaled = (points[:, 1] - fixed_min_y) / (fixed_max_y - fixed_min_y)
+        x_scaled = (x_scaled * width).astype(np.int32)
+        y_scaled = ((1 - y_scaled) * height).astype(np.int32)
 
-            if 0 <= x_scaled < width and 0 <= y_scaled < height:
-                image[y_scaled, x_scaled] = (255, 255, 255)
+        valid_indices = (x_scaled >= 0) & (x_scaled < width) & (y_scaled >= 0) & (y_scaled < height)
+
+        image[y_scaled[valid_indices], x_scaled[valid_indices]] = (255, 255, 255)
+
+        # 0.0620983921420000000 s : convert_to_image
+        # 0.0022649765014648438 s : convert_to_image_new
+        # 0.0005433559417724609 s : convert_to_image_new (only x, y & int)
 
         return image
 
