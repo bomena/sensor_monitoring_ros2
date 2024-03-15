@@ -1,7 +1,6 @@
 xhost +local:docker
 sudo docker run --name monitoring_ros2 -it \
   --privileged \
-  --env ROS_MASTER_URI=http://localhost:11311 \
   --net=host \
   -e DISPLAY=$DISPLAY \
   -p 3000:3000 \
