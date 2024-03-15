@@ -31,7 +31,7 @@ class RosbagControlNode(Node):
 
     def rosbag_record_callback(self, msg):
         # Path to your record.sh script
-        script_path = "/home/Web/sensor_monitoring_ros2/src/record.sh"
+        script_path = "/home/Web/sensor_monitoring_ros2/src/function/record.sh"
 
         if msg.data and not self.rosbag_process:
             self.get_logger().info("Starting rosbag recording via record.sh...")
