@@ -23,12 +23,12 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get -qq install nodejs --yes
 
 RUN \
+  apt-get -qq update && \
   apt install -y python3-pip && \
   apt install -y ros-humble-novatel-oem7-driver && \
   apt install -y ros-humble-novatel-oem7-msgs && \
-  apt-get install ros-humble-sensor-msgs-py && \
-  apt-get install -y ros-humble-rqt* && \
-  apt-get -qq update
+  apt-get install -y ros-humble-sensor-msgs-py && \
+  apt-get install -y ros-humble-rqt*
 
 WORKDIR /home/Web
 RUN git clone https://github.com/bomena/sensor_monitoring_ros2.git
