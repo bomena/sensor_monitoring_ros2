@@ -28,7 +28,7 @@ RUN \
   apt install -y ros-humble-novatel-oem7-driver && \
   apt install -y ros-humble-novatel-oem7-msgs && \
   apt-get install -y ros-humble-sensor-msgs-py && \
-  apt-get install -y ros-humble-rqt*
+  apt install -y ros-humble-rqt* --fix-missing
 
 WORKDIR /home/Web
 RUN git clone https://github.com/bomena/sensor_monitoring_ros2.git
